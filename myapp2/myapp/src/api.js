@@ -1,4 +1,3 @@
-```javascript
 // API base configuration
 const API_BASE_URL = 'https://smart-parking-backend-z9ww.onrender.com/api';
 
@@ -7,14 +6,14 @@ const getAuthHeaders = () => {
     const token = localStorage.getItem('token');
     return {
         'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${ token } ` })
+        ...(token && { Authorization: `Bearer ${token} ` })
     };
 };
 
 // Fetch all slots
 export const fetchSlots = async () => {
     try {
-        const response = await fetch(`${ API_BASE_URL } /slots/all`, {
+        const response = await fetch(`${API_BASE_URL} /slots/all`, {
             headers: getAuthHeaders()
         });
 
@@ -33,7 +32,7 @@ export const fetchSlots = async () => {
 // Create a booking
 export const createBooking = async (bookingData) => {
     try {
-        const response = await fetch(`${ API_BASE_URL } /bookings/create`, {
+        const response = await fetch(`${API_BASE_URL} /bookings/create`, {
             method: 'POST',
             headers: getAuthHeaders(),
             body: JSON.stringify(bookingData)
@@ -55,7 +54,7 @@ export const createBooking = async (bookingData) => {
 // Get user's bookings
 export const getMyBookings = async () => {
     try {
-        const response = await fetch(`${ API_BASE_URL } /bookings/my - bookings`, {
+        const response = await fetch(`${API_BASE_URL} /bookings/my - bookings`, {
             headers: getAuthHeaders()
         });
 
@@ -76,7 +75,7 @@ export const getMyBookings = async () => {
 // Get all users (admin only)
 export const getAllUsers = async () => {
     try {
-        const response = await fetch(`${ API_BASE_URL } /admin/users`, {
+        const response = await fetch(`${API_BASE_URL} /admin/users`, {
             headers: getAuthHeaders()
         });
 
@@ -95,7 +94,7 @@ export const getAllUsers = async () => {
 // Create a new slot (admin only)
 export const createSlot = async (slotData) => {
     try {
-        const response = await fetch(`${ API_BASE_URL } /admin/create - slot`, {
+        const response = await fetch(`${API_BASE_URL} /admin/create - slot`, {
             method: 'POST',
             headers: getAuthHeaders(),
             body: JSON.stringify(slotData)
@@ -117,7 +116,7 @@ export const createSlot = async (slotData) => {
 // Get all bookings (admin only)
 export const getAllBookings = async () => {
     try {
-        const response = await fetch(`${ API_BASE_URL } /bookings/all`, {
+        const response = await fetch(`${API_BASE_URL} /bookings/all`, {
             headers: getAuthHeaders()
         });
 
@@ -136,7 +135,7 @@ export const getAllBookings = async () => {
 // Get analytics (admin only)
 export const getAnalytics = async () => {
     try {
-        const response = await fetch(`${ API_BASE_URL } /analytics/dashboard`, {
+        const response = await fetch(`${API_BASE_URL} /analytics/dashboard`, {
             headers: getAuthHeaders()
         });
 
