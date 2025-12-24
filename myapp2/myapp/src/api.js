@@ -32,7 +32,7 @@ export const fetchSlots = async () => {
 // Create a booking
 export const createBooking = async (bookingData) => {
     try {
-        const response = await fetch(`${API_BASE_URL} /bookings/create`, {
+        const response = await fetch(`${API_BASE_URL}/bookings/create`, {
             method: 'POST',
             headers: getAuthHeaders(),
             body: JSON.stringify(bookingData)
