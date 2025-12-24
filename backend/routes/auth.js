@@ -18,13 +18,20 @@ router.post("/register", async (req, res) => {
     const { name, email, password, vehicleNumber, vehicleType, phone, role } =
       req.body;
 
-    // Normalize email
     const normalizedEmail = normalizeEmail(email);
+    const normalizedVehicle = vehicleNumber ? vehicleNumber.trim().toUpperCase() : vehicleNumber;
 
     // check if user already exists
-    const existingUser = await User.findOne({ email: normalizedEmail });
+    const existingUser = await User.findOne({
+      $or: [
+        { email: normalizedEmail },
+        { vehicleNumber: normalizedVehicle }
+      ]
+    });
+
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+      const field = existingUser.email === normalizedEmail ? "Email" : "Vehicle Number";
+      return res.status(400).json({ message: `User already exists with this ${field}` });
     }
 
     // hash password
@@ -34,15 +41,31 @@ router.post("/register", async (req, res) => {
       name,
       email: normalizedEmail,
       password: hashedPassword,
-      vehicleNumber,
+      vehicleNumber: normalizedVehicle,
       vehicleType,
       phone,
-      role,
+      role: role || 'user', // Default to 'user' if not specified
     });
 
     await user.save();
 
-    res.json({ message: "Registration successful" });
+    // Create JWT token (same as login)
+    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, {
+      expiresIn: "24h",
+    });
+
+    // Return token and user data (auto-login after registration)
+    res.json({
+      message: "Registration successful",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        vehicleNumber: user.vehicleNumber
+      }
+    });
   } catch (error) {
     console.error("Registration error:", error);
     res.status(500).json({ error: error.message });
@@ -53,33 +76,43 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     console.log("Login body:", req.body);
-    const { email, password } = req.body;
+    const { email, vehicleNumber, identifier, password } = req.body;
+    const loginId = (identifier || email || vehicleNumber || "").trim();
 
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password required" });
+    if (!loginId || !password) {
+      return res.status(400).json({ message: "Email/Vehicle Number and Password are required" });
     }
 
-    const normalizedEmail = normalizeEmail(email);
-
-    const user = await User.findOne({ email: normalizedEmail });
+    // Try finding by email (lowercase) or vehicleNumber (uppercase)
+    let user = await User.findOne({ email: loginId.toLowerCase() });
     if (!user) {
-      console.log("Login failed: user not found for", normalizedEmail);
-      return res.status(400).json({ message: "User not found" });
+      user = await User.findOne({ vehicleNumber: loginId.toUpperCase() });
     }
 
-    console.log("Found user (id):", user._id.toString());
+    if (!user) {
+      return res.status(400).json({ message: "No account found with this Email or Vehicle Number" });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      console.log("Login failed: incorrect password for", normalizedEmail);
       return res.status(400).json({ message: "Incorrect password" });
     }
 
     // Create JWT token
     const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: "24h", // Increased to 24h for convenience
     });
 
-    return res.json({ message: "Login successful", token });
+    return res.json({
+      message: "Login successful",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        role: user.role,
+        vehicleNumber: user.vehicleNumber
+      }
+    });
   } catch (error) {
     console.error("Login error:", error);
     return res.status(500).json({ error: error.message });

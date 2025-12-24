@@ -1,0 +1,60 @@
+.location-filter {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.filter-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.filter-icon {
+    font-size: 20px;
+}
+
+.filter-label {
+    font-size: 16px;
+}
+
+.location-select {
+    flex: 1;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 500;
+}
+
+.location-select:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.location-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.location-select optgroup {
+    font-weight: bold;
+    color: #667eea;
+    padding: 5px;
+}
+
+.location-select option {
+    padding: 8px;
+    font-weight: normal;
+    color: #333;
+}

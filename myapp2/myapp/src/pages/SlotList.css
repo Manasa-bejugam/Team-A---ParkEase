@@ -1,0 +1,128 @@
+.slot-list-container {
+    padding: 30px 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slot-list-title {
+    text-align: center;
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 40px;
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    position: relative;
+    padding-bottom: 20px;
+}
+
+/* Decorative underline */
+.slot-list-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+    border-radius: 2px;
+}
+
+.slot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+    perspective: 1000px;
+}
+
+/* Staggered animation for slot cards */
+.slot-grid>* {
+    animation: slideInUp 0.6s ease-out backwards;
+}
+
+.slot-grid>*:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.slot-grid>*:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.slot-grid>*:nth-child(3) {
+    animation-delay: 0.15s;
+}
+
+.slot-grid>*:nth-child(4) {
+    animation-delay: 0.2s;
+}
+
+.slot-grid>*:nth-child(5) {
+    animation-delay: 0.25s;
+}
+
+.slot-grid>*:nth-child(6) {
+    animation-delay: 0.3s;
+}
+
+.slot-grid>*:nth-child(n+7) {
+    animation-delay: 0.35s;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) rotateX(-10deg);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) rotateX(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .slot-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .slot-list-container {
+        padding: 20px 15px;
+    }
+
+    .slot-list-title {
+        font-size: 28px;
+        margin-bottom: 30px;
+    }
+
+    .slot-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .slot-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

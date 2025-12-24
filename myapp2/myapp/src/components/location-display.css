@@ -1,0 +1,26 @@
+/* Add to existing MyBookings.css */
+
+.booking-location {
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    margin: 10px 0;
+    font-size: 14px;
+    color: #555;
+    font-weight: 500;
+}
+
+.payment-location {
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    margin: 10px 0;
+    font-size: 14px;
+    color: #555;
+    font-weight: 500;
+}
+
+.location-city {
+    color: #888;
+    font-size: 13px;
+}

@@ -1,0 +1,234 @@
+.parking-map-container {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin: 20px auto;
+    max-width: 1200px;
+    box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.1),
+        0 2px 8px rgba(0, 0, 0, 0.05);
+    animation: slideIn 0.6s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.map-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.map-header h3 {
+    font-size: 24px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+}
+
+.map-legend {
+    display: flex;
+    gap: 20px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.legend-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.legend-dot.available {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.legend-dot.booked {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.parking-lot {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    border-radius: 16px;
+    padding: 30px;
+    position: relative;
+}
+
+.entrance-marker,
+.exit-marker {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.exit-marker {
+    margin-top: 20px;
+    margin-bottom: 0;
+}
+
+.entrance-arrow,
+.exit-arrow {
+    font-size: 32px;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.entrance-text,
+.exit-text {
+    font-size: 14px;
+    font-weight: 800;
+    color: #3b82f6;
+    letter-spacing: 2px;
+    margin-top: 5px;
+}
+
+.parking-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.parking-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.row-label {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1e293b;
+    min-width: 80px;
+    padding: 12px 20px;
+    background: white;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.row-slots {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.map-slot {
+    width: 90px;
+    height: 100px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.map-slot::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.2) 0%,
+            transparent 100%);
+    pointer-events: none;
+}
+
+.map-slot.available {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.map-slot.booked {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.map-slot:hover.available {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+}
+
+.slot-number {
+    font-size: 16px;
+    font-weight: 800;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.car-icon {
+    font-size: 28px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .parking-map-container {
+        padding: 20px;
+    }
+
+    .map-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    .parking-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .row-label {
+        min-width: auto;
+    }
+
+    .row-slots {
+        justify-content: center;
+    }
+
+    .map-slot {
+        width: 80px;
+        height: 90px;
+    }
+}

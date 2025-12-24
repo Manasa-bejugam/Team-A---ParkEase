@@ -17,5 +17,30 @@ router.get("/users", auth, admin, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+const Slot = require("../models/slotModel");
+
+// Create Slot Route
+router.post("/create-slot", auth, admin, async (req, res) => {
+  const { slotNumber, isBooked } = req.body;
+  try {
+    const isAvailable = isBooked !== undefined ? !isBooked : true;
+
+    // Check if slot already exists
+    const existingSlot = await Slot.findOne({ slotNumber });
+    if (existingSlot) {
+      return res.status(400).json({ message: "Slot number already exists" });
+    }
+
+    const newSlot = new Slot({
+      slotNumber,
+      isAvailable
+    });
+
+    await newSlot.save();
+    res.status(201).json({ message: "Slot created successfully", slot: newSlot });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 module.exports = router;

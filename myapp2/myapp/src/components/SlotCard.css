@@ -1,0 +1,166 @@
+.slot-card {
+    background: linear-gradient(145deg, #ffffff, #f1f5f9);
+    padding: 30px 20px;
+    border-radius: 16px;
+    font-weight: bold;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    min-height: 140px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid transparent;
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.08),
+        0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Shimmer effect on hover */
+.slot-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg,
+            transparent 30%,
+            rgba(255, 255, 255, 0.3) 50%,
+            transparent 70%);
+    transform: rotate(45deg);
+    transition: all 0.6s;
+    opacity: 0;
+}
+
+.slot-card:hover::before {
+    opacity: 1;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+    }
+
+    100% {
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+    }
+}
+
+.slot-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow:
+        0 12px 35px rgba(0, 0, 0, 0.15),
+        0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.slot-card h3 {
+    margin: 0 0 12px 0;
+    font-size: 24px;
+    position: relative;
+    z-index: 1;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.slot-card p {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+    opacity: 0.95;
+}
+
+/* Available slot - Modern green with gradient */
+.slot-card.available {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-color: #34d399;
+}
+
+.slot-card.available:hover {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+    box-shadow:
+        0 12px 35px rgba(16, 185, 129, 0.4),
+        0 4px 12px rgba(16, 185, 129, 0.2),
+        0 0 0 4px rgba(16, 185, 129, 0.1);
+}
+
+/* Booked slot - Modern red with gradient */
+.slot-card.booked {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    cursor: not-allowed;
+    border-color: #f87171;
+    opacity: 0.85;
+}
+
+.slot-card.booked:hover {
+    transform: none;
+    box-shadow:
+        0 4px 15px rgba(239, 68, 68, 0.3),
+        0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Parking icon indicator */
+.slot-card::after {
+    content: '🚗';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    opacity: 0.3;
+    transition: all 0.3s;
+}
+
+.slot-card:hover::after {
+    opacity: 0.6;
+    transform: scale(1.2);
+}
+
+.slot-card.booked::after {
+    content: '🚫';
+}
+
+/* Pulse animation for available slots */
+.slot-card.available {
+    animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+
+    0%,
+    100% {
+        box-shadow:
+            0 4px 15px rgba(0, 0, 0, 0.08),
+            0 0 0 0 rgba(16, 185, 129, 0);
+    }
+
+    50% {
+        box-shadow:
+            0 4px 15px rgba(0, 0, 0, 0.08),
+            0 0 0 8px rgba(16, 185, 129, 0.2);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .slot-card {
+        min-height: 120px;
+        padding: 25px 15px;
+    }
+
+    .slot-card h3 {
+        font-size: 20px;
+    }
+
+    .slot-card p {
+        font-size: 11px;
+    }
+}
