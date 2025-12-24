@@ -1,6 +1,6 @@
 ```javascript
 // API base configuration
-const API_URL = 'https://smart-parking-backend-z9ww.onrender.com/api';
+const API_BASE_URL = 'https://smart-parking-backend-z9ww.onrender.com/api';
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {
