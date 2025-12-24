@@ -28,7 +28,10 @@ const { startSlotReleaseJob } = require("./jobs/slotReleaseJob");
 startSlotReleaseJob();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['https://smart-parking-brown.vercel.app', 'http://localhost:3000'],
+  credentials: true
+}));
 app.use(express.json());
 
 // Test Route
