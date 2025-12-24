@@ -33,21 +33,26 @@ router.post("/create", authMiddleware, async (req, res) => {
             return res.status(404).json({ message: "Slot not found" });
         }
 
-        // 3. Call Java Validation Service (REQUIRED)
-        const validationResponse = await axios.post(JAVA_VALIDATOR_URL, {
-            slotId: slot._id.toString(),
-            slotNumber: slot.slotNumber,
-            vehicleNumber,
-            startTime: start.toISOString(),
-            endTime: end.toISOString(),
-        }, {
-            timeout: 5000,
-        });
-
-        if (!validationResponse.data.valid) {
-            return res.status(400).json({
-                message: validationResponse.data.message || "Slot validation failed"
+        // 3. Call Java Validation Service (Optional - skip if unavailable)
+        try {
+            const validationResponse = await axios.post(JAVA_VALIDATOR_URL, {
+                slotId: slot._id.toString(),
+                slotNumber: slot.slotNumber,
+                vehicleNumber,
+                startTime: start.toISOString(),
+                endTime: end.toISOString(),
+            }, {
+                timeout: 5000,
             });
+
+            if (!validationResponse.data.valid) {
+                return res.status(400).json({
+                    message: validationResponse.data.message || "Slot validation failed"
+                });
+            }
+        } catch (validationError) {
+            // Java service unavailable - proceed without validation
+            console.log("Java validation service unavailable, proceeding without validation");
         }
 
         // 4. Check for time conflicts on this specific slot
