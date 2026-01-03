@@ -545,6 +545,14 @@ const UserDashboard = () => {
           {activeTab === 'map' && (
             <div className="dashboard-split-view">
               <div className="map-section">
+                {/* Location Filter above map */}
+                <div style={{ marginBottom: '15px' }}>
+                  <LocationFilter
+                    slots={allSlots}
+                    selectedLocation={selectedLocation}
+                    onLocationChange={handleLocationChange}
+                  />
+                </div>
                 <ParkingMap
                   slots={slots}
                   onSelectSlot={handleSelectSlot}
