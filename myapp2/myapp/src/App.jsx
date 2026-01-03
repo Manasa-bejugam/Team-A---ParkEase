@@ -559,7 +559,7 @@ const UserDashboard = () => {
                 />
               </div>
               <div className="side-panel">
-                <AvailableSlotsGrid slots={allSlots} />
+                <AvailableSlotsGrid slots={slots} />
               </div>
             </div>
           )}
