@@ -592,6 +592,7 @@ const AdminDashboard = ({ onSwitchToUserView }) => {
                                         <h3>Slot Usage Statistics</h3>
                                         <div className="slot-usage-grid">
                                             {Object.entries(analytics.slotUsage)
+                                                .filter(([slot]) => slot !== 'Unknown' && slot !== 'null' && slot !== 'undefined')
                                                 .sort((a, b) => b[1] - a[1])
                                                 .slice(0, 10)
                                                 .map(([slot, count]) => (
