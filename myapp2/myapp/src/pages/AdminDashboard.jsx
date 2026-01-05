@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { getAllUsers, createSlot, getAllBookings, fetchSlots, getAnalytics, deleteSlot } from '../api';
+import { getAllUsers, createSlot, getAllBookings, fetchSlots, getAnalytics, deleteSlot, getUserDetails, createAlert, getAllAlertsAdmin, updateAlert, deleteAlert } from '../api';
 import AdminAnalytics from '../components/AdminAnalytics';
 import RecentActivity from '../components/RecentActivity';
+import UserDetailModal from '../components/UserDetailModal';
 import './AdminDashboard.css';
 
 const AdminDashboard = ({ onSwitchToUserView }) => {
@@ -12,6 +13,23 @@ const AdminDashboard = ({ onSwitchToUserView }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+
+    // User management state
+    const [searchQuery, setSearchQuery] = useState('');
+    const [roleFilter, setRoleFilter] = useState('All');
+    const [selectedUserDetails, setSelectedUserDetails] = useState(null);
+    const [showUserModal, setShowUserModal] = useState(false);
+
+    // Alert management state
+    const [alerts, setAlerts] = useState([]);
+    const [alertTargetType, setAlertTargetType] = useState('slot'); // slot, area, city
+    const [alertSlot, setAlertSlot] = useState('');
+    const [alertArea, setAlertArea] = useState('');
+    const [alertCity, setAlertCity] = useState('');
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertType, setAlertType] = useState('info');
+    const [alertSeverity, setAlertSeverity] = useState('info');
+    const [alertExpires, setAlertExpires] = useState('');
 
     // Slot creation form
     const [newSlotNumber, setNewSlotNumber] = useState('');
@@ -50,7 +68,7 @@ const AdminDashboard = ({ onSwitchToUserView }) => {
         setLoading(true);
         setError('');
         try {
-            if (activeTab === 'stats' || activeTab === 'slots') {
+            if (activeTab === 'stats' || activeTab === 'slots' || activeTab === 'alerts') {
                 const slotsData = await fetchSlots();
                 setSlots(slotsData);
 
@@ -154,9 +172,141 @@ const AdminDashboard = ({ onSwitchToUserView }) => {
         }
     };
 
+    const handleViewUserDetails = async (userId) => {
+        try {
+            setLoading(true);
+            const details = await getUserDetails(userId);
+            setSelectedUserDetails(details);
+            setShowUserModal(true);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleString();
     };
+
+    // Filter users based on search and role filter
+    const filteredUsers = users.filter(user => {
+        const matchesSearch = searchQuery === '' ||
+            user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (user.vehicleNumber && user.vehicleNumber.toLowerCase().includes(searchQuery.toLowerCase()));
+
+        const matchesRole = roleFilter === 'All' || user.role === roleFilter.toLowerCase();
+
+        return matchesSearch && matchesRole;
+    });
+
+    // Calculate user statistics
+    const userStats = {
+        totalUsers: users.length,
+        totalAdmins: users.filter(u => u.role === 'admin').length,
+        totalRegularUsers: users.filter(u => u.role === 'user').length
+    };
+
+    // Load alerts
+    const loadAlerts = async () => {
+        try {
+            setLoading(true);
+            const alertsData = await getAllAlertsAdmin();
+            setAlerts(alertsData);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Handle create alert
+    const handleCreateAlert = async (e) => {
+        e.preventDefault();
+        setError('');
+        setSuccess('');
+
+        try {
+            const alertData = {
+                message: alertMessage,
+                type: alertType,
+                severity: alertSeverity,
+                expiresAt: alertExpires || null
+            };
+
+            // Add target based on type
+            if (alertTargetType === 'slot') {
+                if (!alertSlot) {
+                    setError('Please select a slot');
+                    return;
+                }
+                alertData.slot = alertSlot;
+            } else if (alertTargetType === 'area') {
+                if (!alertArea) {
+                    setError('Please enter an area');
+                    return;
+                }
+                alertData.area = alertArea;
+            } else if (alertTargetType === 'city') {
+                if (!alertCity) {
+                    setError('Please enter a city');
+                    return;
+                }
+                alertData.city = alertCity;
+            }
+
+            await createAlert(alertData);
+            setSuccess('Alert created successfully!');
+
+            // Reset form
+            setAlertMessage('');
+            setAlertType('info');
+            setAlertSeverity('info');
+            setAlertExpires('');
+            setAlertSlot('');
+            setAlertArea('');
+            setAlertCity('');
+
+            // Reload alerts
+            loadAlerts();
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    // Handle delete alert
+    const handleDeleteAlert = async (alertId) => {
+        if (!window.confirm('Are you sure you want to delete this alert?')) return;
+
+        try {
+            await deleteAlert(alertId);
+            setSuccess('Alert deleted successfully');
+            loadAlerts();
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    // Helper function to get alert icon
+    const getAlertIcon = (type) => {
+        const icons = {
+            construction: '🚧',
+            maintenance: '🔧',
+            closure: '🚫',
+            warning: '⚠️',
+            info: 'ℹ️'
+        };
+        return icons[type] || 'ℹ️';
+    };
+
+    // Load alerts when alerts tab is active
+    useEffect(() => {
+        if (activeTab === 'alerts') {
+            loadAlerts();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeTab]);
 
     return (
         <div className="admin-dashboard">
@@ -199,6 +349,12 @@ const AdminDashboard = ({ onSwitchToUserView }) => {
                 >
                     📈 Analytics
                 </button>
+                <button
+                    className={`tab ${activeTab === 'alerts' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('alerts')}
+                >
+                    🚨 Alerts
+                </button>
             </div>
 
             {/* Content Area */}
@@ -238,36 +394,100 @@ const AdminDashboard = ({ onSwitchToUserView }) => {
 
                 {/* Users Tab */}
                 {activeTab === 'users' && !loading && (
-                    <div className="table-container">
-                        <h3>Registered Users</h3>
-                        <table className="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Vehicle Number</th>
-                                    <th>Vehicle Type</th>
-                                    <th>Phone</th>
-                                    <th>Role</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {users.map(user => (
-                                    <tr key={user._id}>
-                                        <td>{user.name}</td>
-                                        <td>{user.email}</td>
-                                        <td>{user.vehicleNumber}</td>
-                                        <td>{user.vehicleType}</td>
-                                        <td>{user.phone}</td>
-                                        <td>
-                                            <span className={`role-badge ${user.role}`}>
-                                                {user.role}
-                                            </span>
-                                        </td>
+                    <div className="users-section">
+                        {/* User Statistics */}
+                        <div className="stats-grid" style={{ marginBottom: '24px' }}>
+                            <div className="stat-card">
+                                <div className="stat-icon">👥</div>
+                                <div className="stat-value">{userStats.totalUsers}</div>
+                                <div className="stat-label">Total Users</div>
+                            </div>
+                            <div className="stat-card blue">
+                                <div className="stat-icon">👤</div>
+                                <div className="stat-value">{userStats.totalRegularUsers}</div>
+                                <div className="stat-label">Regular Users</div>
+                            </div>
+                            <div className="stat-card purple">
+                                <div className="stat-icon">🛡️</div>
+                                <div className="stat-value">{userStats.totalAdmins}</div>
+                                <div className="stat-label">Admins</div>
+                            </div>
+                        </div>
+
+                        {/* Search and Filter */}
+                        <div className="users-controls">
+                            <div className="search-bar">
+                                <input
+                                    type="text"
+                                    placeholder="🔍 Search by name, email, or vehicle number..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="search-input"
+                                />
+                            </div>
+                            <div className="filter-group">
+                                <label>Role:</label>
+                                <select
+                                    value={roleFilter}
+                                    onChange={(e) => setRoleFilter(e.target.value)}
+                                    className="filter-select"
+                                >
+                                    <option value="All">All Roles</option>
+                                    <option value="user">Users</option>
+                                    <option value="admin">Admins</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* Users Table */}
+                        <div className="table-container">
+                            <h3>Registered Users ({filteredUsers.length})</h3>
+                            <table className="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Vehicle Number</th>
+                                        <th>Vehicle Type</th>
+                                        <th>Phone</th>
+                                        <th>Role</th>
+                                        <th>Actions</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {filteredUsers.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="7" className="empty-state">
+                                                No users found matching your criteria
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        filteredUsers.map(user => (
+                                            <tr key={user._id}>
+                                                <td>{user.name}</td>
+                                                <td>{user.email}</td>
+                                                <td>{user.vehicleNumber || 'N/A'}</td>
+                                                <td>{user.vehicleType || 'N/A'}</td>
+                                                <td>{user.phone || 'N/A'}</td>
+                                                <td>
+                                                    <span className={`role-badge ${user.role}`}>
+                                                        {user.role}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <button
+                                                        className="view-details-btn"
+                                                        onClick={() => handleViewUserDetails(user._id)}
+                                                    >
+                                                        View Details
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
 
@@ -622,7 +842,226 @@ const AdminDashboard = ({ onSwitchToUserView }) => {
                         )}
                     </div>
                 )}
+
+                {/* Alerts Tab */}
+                {activeTab === 'alerts' && (
+                    <div className="alerts-section">
+                        {/* Create Alert Form */}
+                        <div className="create-alert-form">
+                            <h3>🚨 Create New Alert</h3>
+                            <form onSubmit={handleCreateAlert}>
+                                {/* Target Type Selection */}
+                                <div className="form-row">
+                                    <div className="input-group">
+                                        <label>Alert Target</label>
+                                        <select
+                                            value={alertTargetType}
+                                            onChange={(e) => setAlertTargetType(e.target.value)}
+                                            className="slot-input"
+                                        >
+                                            <option value="slot">Specific Slot</option>
+                                            <option value="area">Area-wide</option>
+                                            <option value="city">City-wide</option>
+                                        </select>
+                                    </div>
+
+                                    {/* Conditional Target Input */}
+                                    {alertTargetType === 'slot' && (
+                                        <div className="input-group">
+                                            <label>Select Slot</label>
+                                            <select
+                                                value={alertSlot}
+                                                onChange={(e) => setAlertSlot(e.target.value)}
+                                                className="slot-input"
+                                                required
+                                            >
+                                                <option value="">-- Select Slot --</option>
+                                                {slots.map(slot => (
+                                                    <option key={slot._id} value={slot._id}>
+                                                        {slot.slotNumber} - {slot.address || slot.city}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    )}
+
+                                    {alertTargetType === 'area' && (
+                                        <div className="input-group">
+                                            <label>Area Name</label>
+                                            <input
+                                                type="text"
+                                                placeholder="e.g., Madhapur, Level 1"
+                                                value={alertArea}
+                                                onChange={(e) => setAlertArea(e.target.value)}
+                                                className="slot-input"
+                                                required
+                                            />
+                                        </div>
+                                    )}
+
+                                    {alertTargetType === 'city' && (
+                                        <div className="input-group">
+                                            <label>City Name</label>
+                                            <input
+                                                type="text"
+                                                placeholder="e.g., Hyderabad"
+                                                value={alertCity}
+                                                onChange={(e) => setAlertCity(e.target.value)}
+                                                className="slot-input"
+                                                required
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Alert Message */}
+                                <div className="input-group full-width">
+                                    <label>Alert Message</label>
+                                    <textarea
+                                        placeholder="Enter alert message (max 500 characters)"
+                                        value={alertMessage}
+                                        onChange={(e) => setAlertMessage(e.target.value)}
+                                        className="slot-input alert-textarea"
+                                        maxLength={500}
+                                        rows={3}
+                                        required
+                                    />
+                                    <small>{alertMessage.length}/500 characters</small>
+                                </div>
+
+                                {/* Alert Type and Severity */}
+                                <div className="form-row">
+                                    <div className="input-group">
+                                        <label>Alert Type</label>
+                                        <select
+                                            value={alertType}
+                                            onChange={(e) => setAlertType(e.target.value)}
+                                            className="slot-input"
+                                        >
+                                            <option value="info">ℹ️ Information</option>
+                                            <option value="warning">⚠️ Warning</option>
+                                            <option value="construction">🚧 Construction</option>
+                                            <option value="maintenance">🔧 Maintenance</option>
+                                            <option value="closure">🚫 Closure</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="input-group">
+                                        <label>Severity Level</label>
+                                        <select
+                                            value={alertSeverity}
+                                            onChange={(e) => setAlertSeverity(e.target.value)}
+                                            className="slot-input"
+                                        >
+                                            <option value="info">Info (Blue)</option>
+                                            <option value="warning">Warning (Yellow)</option>
+                                            <option value="critical">Critical (Red)</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="input-group">
+                                        <label>Expires At (Optional)</label>
+                                        <input
+                                            type="datetime-local"
+                                            value={alertExpires}
+                                            onChange={(e) => setAlertExpires(e.target.value)}
+                                            className="slot-input"
+                                        />
+                                    </div>
+                                </div>
+
+                                <button type="submit" className="create-btn">
+                                    Create Alert
+                                </button>
+                            </form>
+                        </div>
+
+                        {/* Active Alerts List */}
+                        <div className="table-container">
+                            <h3>Active Alerts ({alerts.length})</h3>
+                            {!loading && alerts.length === 0 ? (
+                                <div className="empty-state">No alerts created yet</div>
+                            ) : (
+                                <table className="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Target</th>
+                                            <th>Message</th>
+                                            <th>Severity</th>
+                                            <th>Created</th>
+                                            <th>Expires</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {alerts.map(alert => (
+                                            <tr key={alert._id}>
+                                                <td>
+                                                    <span className="alert-type-badge">
+                                                        {getAlertIcon(alert.type)} {alert.type}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    {alert.slot ? (
+                                                        <span>Slot: {alert.slot.slotNumber}</span>
+                                                    ) : alert.area ? (
+                                                        <span>Area: {alert.area}</span>
+                                                    ) : alert.city ? (
+                                                        <span>City: {alert.city}</span>
+                                                    ) : (
+                                                        <span>-</span>
+                                                    )}
+                                                </td>
+                                                <td className="alert-message-cell">
+                                                    {alert.message}
+                                                </td>
+                                                <td>
+                                                    <span className={`severity-badge ${alert.severity}`}>
+                                                        {alert.severity}
+                                                    </span>
+                                                </td>
+                                                <td>{new Date(alert.createdAt).toLocaleDateString()}</td>
+                                                <td>
+                                                    {alert.expiresAt ?
+                                                        new Date(alert.expiresAt).toLocaleDateString() :
+                                                        'Never'
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <span className={`status-badge ${alert.isActive ? 'available' : 'booked'}`}>
+                                                        {alert.isActive ? 'Active' : 'Inactive'}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <button
+                                                        className="delete-btn"
+                                                        onClick={() => handleDeleteAlert(alert._id)}
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
+
+            {/* User Detail Modal */}
+            {showUserModal && selectedUserDetails && (
+                <UserDetailModal
+                    userDetails={selectedUserDetails}
+                    onClose={() => {
+                        setShowUserModal(false);
+                        setSelectedUserDetails(null);
+                    }}
+                />
+            )}
         </div>
     );
 };

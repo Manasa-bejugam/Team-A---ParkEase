@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { getSlotAlerts, getAreaAlerts } from '../api';
+import AlertModal from './AlertModal';
 import './ParkingMap.css';
 
 // Fix for default Leaflet marker icons in React
@@ -70,6 +72,11 @@ const ParkingMap = ({ slots, onSelectSlot }) => {
     const [hasLocation, setHasLocation] = useState(false);
     const [demoAnchor, setDemoAnchor] = useState(DEFAULT_CENTER);
 
+    // Alert state
+    const [slotAlerts, setSlotAlerts] = useState({});
+    const [selectedSlotAlerts, setSelectedSlotAlerts] = useState(null);
+    const [selectedSlotNumber, setSelectedSlotNumber] = useState('');
+
     // Watch user location for the "You" marker
     useEffect(() => {
         if (navigator.geolocation) {
@@ -126,6 +133,54 @@ const ParkingMap = ({ slots, onSelectSlot }) => {
         setMapCenter(targetCenter);
         setDemoAnchor(targetCenter);
     }, [slots]); // Run whenever the slots list updates (filter changed)
+
+    // Fetch alerts for all slots
+    useEffect(() => {
+        const fetchAllAlerts = async () => {
+            if (!slots || slots.length === 0) return;
+
+            const alertsMap = {};
+
+            for (const slot of slots) {
+                try {
+                    const alertPromises = [];
+
+                    // Fetch slot-specific alerts
+                    if (slot._id || slot.id) {
+                        alertPromises.push(getSlotAlerts(slot._id || slot.id));
+                    }
+
+                    // Fetch area alerts
+                    if (slot.area) {
+                        alertPromises.push(getAreaAlerts(slot.area));
+                    }
+
+                    // Fetch city alerts
+                    if (slot.city) {
+                        alertPromises.push(getAreaAlerts(slot.city));
+                    }
+
+                    const results = await Promise.all(alertPromises);
+                    const allAlerts = results.flat();
+
+                    // Remove duplicates
+                    const uniqueAlerts = Array.from(
+                        new Map(allAlerts.map(alert => [alert._id, alert])).values()
+                    );
+
+                    if (uniqueAlerts.length > 0) {
+                        alertsMap[slot._id || slot.id] = uniqueAlerts;
+                    }
+                } catch (error) {
+                    console.error(`Error fetching alerts for slot ${slot.slotNumber}:`, error);
+                }
+            }
+
+            setSlotAlerts(alertsMap);
+        };
+
+        fetchAllAlerts();
+    }, [slots]);
 
     const handleLocateMe = () => {
         if (!navigator.geolocation) {
@@ -237,17 +292,87 @@ const ParkingMap = ({ slots, onSelectSlot }) => {
                                         </strong>
                                     </div>
 
-                                    {slot.isAvailable && (
-                                        <button className="map-book-btn" onClick={() => onSelectSlot(slot)}>
-                                            Book Now
-                                        </button>
-                                    )}
+                                    {/* Alert Indicator */}
+                                    {slotAlerts[slot._id || slot.id] && slotAlerts[slot._id || slot.id].length > 0 && (() => {
+                                        const alerts = slotAlerts[slot._id || slot.id];
+                                        const hasWarningOrCritical = alerts.some(
+                                            alert => alert.severity === 'warning' || alert.severity === 'critical'
+                                        );
+
+                                        return (
+                                            <div style={{ margin: '8px 0', padding: '6px', background: '#fef3c7', borderRadius: '6px', border: '1px solid #f59e0b' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                                                    <span>⚠️</span>
+                                                    <strong style={{ color: '#92400e', fontSize: '0.85em' }}>
+                                                        {alerts.length} Alert{alerts.length > 1 ? 's' : ''}
+                                                    </strong>
+                                                </div>
+                                                <button
+                                                    className="map-book-btn"
+                                                    onClick={() => {
+                                                        setSelectedSlotAlerts(alerts);
+                                                        setSelectedSlotNumber(slot.slotNumber);
+                                                    }}
+                                                    style={{ background: '#f59e0b', fontSize: '0.75em', padding: '4px 8px' }}
+                                                >
+                                                    View Alerts
+                                                </button>
+                                                {hasWarningOrCritical && (
+                                                    <div style={{ marginTop: '4px', fontSize: '0.75em', color: '#92400e' }}>
+                                                        ⚠️ Booking disabled due to alerts
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })()}
+
+                                    {slot.isAvailable && (() => {
+                                        const alerts = slotAlerts[slot._id || slot.id];
+                                        const hasWarningOrCritical = alerts && alerts.some(
+                                            alert => alert.severity === 'warning' || alert.severity === 'critical'
+                                        );
+
+                                        if (hasWarningOrCritical) {
+                                            return (
+                                                <button
+                                                    className="map-book-btn"
+                                                    disabled
+                                                    style={{
+                                                        background: '#9ca3af',
+                                                        cursor: 'not-allowed',
+                                                        opacity: 0.6
+                                                    }}
+                                                    title="Booking unavailable due to alerts"
+                                                >
+                                                    Booking Unavailable
+                                                </button>
+                                            );
+                                        }
+
+                                        return (
+                                            <button className="map-book-btn" onClick={() => onSelectSlot(slot)}>
+                                                Book Now
+                                            </button>
+                                        );
+                                    })()}
                                 </div>
                             </Popup>
                         </Marker>
                     );
                 })}
             </MapContainer>
+
+            {/* Alert Modal */}
+            {selectedSlotAlerts && (
+                <AlertModal
+                    alerts={selectedSlotAlerts}
+                    slotNumber={selectedSlotNumber}
+                    onClose={() => {
+                        setSelectedSlotAlerts(null);
+                        setSelectedSlotNumber('');
+                    }}
+                />
+            )}
         </div>
     );
 };

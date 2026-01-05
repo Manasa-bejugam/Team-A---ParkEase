@@ -38,10 +38,41 @@ const MyPayments = () => {
     };
 
     const calculatePayment = (booking) => {
+        console.log('Calculating payment for booking:', {
+            id: booking._id,
+            parkingStatus: booking.parkingStatus,
+            actualDuration: booking.actualDuration,
+            actualEntryTime: booking.actualEntryTime,
+            paymentAmount: booking.payment?.amount
+        });
+
+        // If booking has been checked out, use actual duration and payment amount
+        if (booking.parkingStatus === 'CHECKED_OUT' && booking.actualDuration) {
+            const hours = (booking.actualDuration / 60).toFixed(2);
+            const amount = booking.payment?.amount || 0;
+            console.log('Using CHECKED_OUT data:', { hours, amount });
+            return { hours, amount: amount.toFixed(2) };
+        }
+
+        // If checked in but not checked out, calculate current usage
+        if (booking.parkingStatus === 'CHECKED_IN' && booking.actualEntryTime) {
+            const now = new Date();
+            const entryTime = new Date(booking.actualEntryTime);
+            const minutes = Math.abs(now - entryTime) / 60000; // milliseconds to minutes
+            const hours = (minutes / 60).toFixed(2);
+            // Calculate fee based on 15-minute intervals (₹5 per 15 min)
+            const roundedMinutes = Math.ceil(minutes / 15) * 15;
+            const amount = (roundedMinutes / 15) * 5;
+            console.log('Using CHECKED_IN data:', { minutes, hours, amount });
+            return { hours, amount: amount.toFixed(2) };
+        }
+
+        // For scheduled bookings or fallback, show booked duration
         const start = new Date(booking.startTime);
         const end = new Date(booking.endTime);
         const hours = Math.abs(end - start) / 36e5; // milliseconds to hours
         const amount = hours * 20; // ₹20 per hour
+        console.log('Using SCHEDULED/fallback data:', { hours, amount, parkingStatus: booking.parkingStatus });
         return { hours: hours.toFixed(2), amount: amount.toFixed(2) };
     };
 
@@ -129,7 +160,7 @@ const MyPayments = () => {
                                         </span>
                                     </div>
                                     <div className="detail-row">
-                                        <span>⏱️ Duration:</span>
+                                        <span>⏱️ Duration (Actual):</span>
                                         <span>{payment.hours} hours</span>
                                     </div>
                                     <div className="detail-row amount-row">

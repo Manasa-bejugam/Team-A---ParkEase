@@ -17,6 +17,81 @@ router.get("/users", auth, admin, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// Get detailed user information (Admin only)
+const Booking = require("../models/bookingModel");
+router.get("/users/:userId/details", auth, admin, async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    // Get user information
+    const user = await User.findById(userId).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Get user's booking history
+    const bookings = await Booking.find({ user: userId })
+      .populate("slot", "slotNumber section address city area")
+      .sort({ createdAt: -1 });
+
+    // Calculate statistics
+    const totalBookings = bookings.length;
+    const activeBookings = bookings.filter(b => b.status === "BOOKED").length;
+    const completedBookings = bookings.filter(b => b.status === "COMPLETED").length;
+
+    // Calculate total amount spent
+    const totalSpent = bookings.reduce((sum, booking) => {
+      return sum + (booking.payment?.amount || 0);
+    }, 0);
+
+    // Get account creation date
+    const accountCreatedAt = user._id.getTimestamp();
+
+    res.json({
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        vehicleNumber: user.vehicleNumber,
+        vehicleType: user.vehicleType,
+        phone: user.phone,
+        role: user.role,
+        createdAt: accountCreatedAt,
+        expiresAt: user.expiresAt
+      },
+      statistics: {
+        totalBookings,
+        activeBookings,
+        completedBookings,
+        totalSpent: totalSpent.toFixed(2)
+      },
+      bookings: bookings.map(booking => ({
+        id: booking._id,
+        slotNumber: booking.slot?.slotNumber || 'N/A',
+        slotSection: booking.slot?.section || 'General',
+        location: booking.slot?.address || 'N/A',
+        city: booking.slot?.city || 'N/A',
+        vehicleNumber: booking.vehicleNumber,
+        startTime: booking.startTime,
+        endTime: booking.endTime,
+        actualEntryTime: booking.actualEntryTime,
+        actualExitTime: booking.actualExitTime,
+        actualDuration: booking.actualDuration,
+        parkingStatus: booking.parkingStatus,
+        status: booking.status,
+        paymentAmount: booking.payment?.amount || 0,
+        paymentStatus: booking.payment?.status || 'pending',
+        paymentMethod: booking.payment?.method,
+        createdAt: booking.createdAt
+      }))
+    });
+  } catch (err) {
+    console.error("Error fetching user details:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 const Slot = require("../models/slotModel");
 
 // Create Slot Route

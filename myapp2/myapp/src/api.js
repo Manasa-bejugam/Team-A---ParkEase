@@ -99,6 +99,26 @@ export const getAllUsers = async () => {
     }
 };
 
+// Get detailed user information (admin only)
+export const getUserDetails = async (userId) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/details`, {
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch user details');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching user details:', error);
+        throw error;
+    }
+};
+
+
 // Create a new slot (admin only)
 export const createSlot = async (slotData) => {
     try {
@@ -289,3 +309,145 @@ export const getFeeDetails = async (bookingId) => {
     }
 };
 
+// ============ ALERT API FUNCTIONS ============
+
+// Admin: Create alert
+export const createAlert = async (alertData) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/alerts`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(alertData)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to create alert');
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Error creating alert:', error);
+        throw error;
+    }
+};
+
+// Admin: Get all alerts (including inactive)
+export const getAllAlertsAdmin = async () => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/alerts/all`, {
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch alerts');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching alerts:', error);
+        throw error;
+    }
+};
+
+// Admin: Update alert
+export const updateAlert = async (alertId, alertData) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/alerts/${alertId}`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(alertData)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to update alert');
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Error updating alert:', error);
+        throw error;
+    }
+};
+
+// Admin: Delete alert
+export const deleteAlert = async (alertId) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/admin/alerts/${alertId}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders()
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to delete alert');
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Error deleting alert:', error);
+        throw error;
+    }
+};
+
+// Public: Get all active alerts
+export const getActiveAlerts = async () => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/alerts`, {
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch active alerts');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching active alerts:', error);
+        throw error;
+    }
+};
+
+// Public: Get alerts for specific slot
+export const getSlotAlerts = async (slotId) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/alerts/slot/${slotId}`, {
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch slot alerts');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching slot alerts:', error);
+        throw error;
+    }
+};
+
+// Public: Get alerts for specific area
+export const getAreaAlerts = async (area) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/alerts/area/${encodeURIComponent(area)}`, {
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch area alerts');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching area alerts:', error);
+        throw error;
+    }
+};
