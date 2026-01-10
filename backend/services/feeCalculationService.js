@@ -1,13 +1,13 @@
 /**
  * Fee Calculation Service
  * Calculates parking fees based on duration
- * Pricing: ₹20 per hour (₹5 per 15 minutes)
+ * Pricing: ₹20 base fee + ₹5 per 15 minutes of actual usage
  * Rounds up to nearest 15-minute interval
  */
 
 class FeeCalculationService {
     constructor() {
-        this.RATE_PER_HOUR = 20.0;      // ₹20 per hour
+        this.BASE_FEE = 20.0;           // ₹20 base fee
         this.RATE_PER_15_MIN = 5.0;     // ₹5 per 15 minutes
     }
 
@@ -16,7 +16,7 @@ class FeeCalculationService {
      * Logic:
      * 1. Get total duration in minutes
      * 2. Round up to nearest 15-minute interval
-     * 3. Calculate fee: (rounded minutes / 15) × ₹5
+     * 3. Calculate fee: ₹20 base + (rounded minutes / 15) × ₹5
      * 
      * @param {number} durationMinutes - Parking duration in minutes
      * @returns {Object} Fee details { actualDuration, roundedDuration, fee }
@@ -27,20 +27,23 @@ class FeeCalculationService {
             return {
                 actualDuration: 0,
                 roundedDuration: 0,
-                fee: 0
+                fee: this.BASE_FEE  // Minimum charge is base fee
             };
         }
 
         // Round up to nearest 15-minute interval
         const roundedMinutes = this.roundUpTo15Minutes(durationMinutes);
 
-        // Calculate fee: (rounded minutes / 15) × ₹5
-        const fee = (roundedMinutes / 15.0) * this.RATE_PER_15_MIN;
+        // Calculate fee: ₹20 base + (rounded minutes / 15) × ₹5
+        const timeCharge = (roundedMinutes / 15.0) * this.RATE_PER_15_MIN;
+        const fee = this.BASE_FEE + timeCharge;
 
         console.log('✓ Fee calculated:');
         console.log(`  Actual duration: ${durationMinutes} minutes`);
         console.log(`  Rounded to: ${roundedMinutes} minutes`);
-        console.log(`  Fee: ₹${fee}`);
+        console.log(`  Base fee: ₹${this.BASE_FEE}`);
+        console.log(`  Time charge: ₹${timeCharge}`);
+        console.log(`  Total fee: ₹${fee}`);
 
         return {
             actualDuration: durationMinutes,
@@ -76,12 +79,13 @@ class FeeCalculationService {
      */
     getFeeBreakdown(durationMinutes) {
         const roundedMinutes = this.roundUpTo15Minutes(durationMinutes);
-        const fee = (roundedMinutes / 15.0) * this.RATE_PER_15_MIN;
+        const timeCharge = (roundedMinutes / 15.0) * this.RATE_PER_15_MIN;
+        const fee = this.BASE_FEE + timeCharge;
 
         const hours = Math.floor(roundedMinutes / 60);
         const minutes = roundedMinutes % 60;
 
-        return `Duration: ${durationMinutes} min → Charged: ${roundedMinutes} min (${hours}h ${minutes}m) → Fee: ₹${fee}`;
+        return `Duration: ${durationMinutes} min → Charged: ${roundedMinutes} min (${hours}h ${minutes}m) → Base: ₹${this.BASE_FEE} + Time: ₹${timeCharge} = Total: ₹${fee}`;
     }
 
     /**
@@ -90,10 +94,11 @@ class FeeCalculationService {
      */
     getPricingInfo() {
         return {
-            ratePerHour: this.RATE_PER_HOUR,
+            baseFee: this.BASE_FEE,
             ratePer15Min: this.RATE_PER_15_MIN,
-            minimumCharge: this.RATE_PER_15_MIN,
-            billingInterval: '15 minutes'
+            minimumCharge: this.BASE_FEE,
+            billingInterval: '15 minutes',
+            description: `₹${this.BASE_FEE} base fee + ₹${this.RATE_PER_15_MIN} per 15 minutes`
         };
     }
 }
