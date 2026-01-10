@@ -464,7 +464,8 @@ const UserDashboard = () => {
       setError(null);
       const slotsData = await fetchSlots();
       setAllSlots(slotsData);
-      setSlots(slotsData); // Show all slots by default for the map
+      // Don't show slots by default - user must select a location first
+      // setSlots will be updated when handleLocationChange is called
     } catch (err) {
       setError(err.message);
     } finally {
@@ -476,7 +477,7 @@ const UserDashboard = () => {
   const handleLocationChange = (address) => {
     setSelectedLocation(address);
     if (address === '') {
-      setSlots(allSlots); // Show all slots
+      setSlots([]); // Don't show any slots when no location is selected
     } else {
       const filtered = allSlots.filter(slot => slot.address === address);
       setSlots(filtered);
@@ -554,13 +555,32 @@ const UserDashboard = () => {
                     onLocationChange={handleLocationChange}
                   />
                 </div>
-                <ParkingMap
-                  slots={slots}
-                  onSelectSlot={handleSelectSlot}
-                />
+
+                {/* Show message if no location selected */}
+                {slots.length === 0 ? (
+                  <div className="no-location-selected">
+                    <div className="empty-state-icon">📍</div>
+                    <h3>Select a Location to View Parking Slots</h3>
+                    <p>Choose a city and address from the dropdown above to see available parking spots on the map.</p>
+                  </div>
+                ) : (
+                  <>
+                    <ParkingMap
+                      slots={slots}
+                      onSelectSlot={handleSelectSlot}
+                    />
+                  </>
+                )}
               </div>
               <div className="side-panel">
-                <AvailableSlotsGrid slots={slots} />
+                {slots.length > 0 ? (
+                  <AvailableSlotsGrid slots={slots} />
+                ) : (
+                  <div className="empty-slots-grid">
+                    <p>🔍 No location selected</p>
+                    <p style={{ fontSize: '14px', color: '#666' }}>Select a location to view available slots</p>
+                  </div>
+                )}
               </div>
             </div>
           )}

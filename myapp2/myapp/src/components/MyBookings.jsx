@@ -128,7 +128,7 @@ const MyBookings = () => {
 
                                 {/* Live Timer Integration */}
                                 {isCheckedIn && booking.actualEntryTime && (
-                                    <LiveParkingTimer entryTime={booking.actualEntryTime} />
+                                    <LiveParkingTimer actualEntryTime={booking.actualEntryTime} />
                                 )}
 
                                 {booking.payment && (

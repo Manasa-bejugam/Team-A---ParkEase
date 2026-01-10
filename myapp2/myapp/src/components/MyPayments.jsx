@@ -43,38 +43,55 @@ const MyPayments = () => {
             parkingStatus: booking.parkingStatus,
             actualDuration: booking.actualDuration,
             actualEntryTime: booking.actualEntryTime,
+            actualExitTime: booking.actualExitTime,
             paymentAmount: booking.payment?.amount
         });
 
+        const BASE_FEE = 20.0;  // ₹20 base fee
+        const RATE_PER_15_MIN = 5.0;  // ₹5 per 15 minutes
+
         // If booking has been checked out, use actual duration and payment amount
-        if (booking.parkingStatus === 'CHECKED_OUT' && booking.actualDuration) {
+        if ((booking.parkingStatus === 'CHECKED_OUT' || booking.status === 'COMPLETED') && booking.actualDuration) {
             const hours = (booking.actualDuration / 60).toFixed(2);
             const amount = booking.payment?.amount || 0;
-            console.log('Using CHECKED_OUT data:', { hours, amount });
+            console.log('Using CHECKED_OUT/COMPLETED data:', { hours, amount });
             return { hours, amount: amount.toFixed(2) };
         }
 
-        // If checked in but not checked out, calculate current usage
+        // If checked in but not checked out, calculate current usage based on actual time
         if (booking.parkingStatus === 'CHECKED_IN' && booking.actualEntryTime) {
             const now = new Date();
             const entryTime = new Date(booking.actualEntryTime);
             const minutes = Math.abs(now - entryTime) / 60000; // milliseconds to minutes
             const hours = (minutes / 60).toFixed(2);
-            // Calculate fee based on 15-minute intervals (₹5 per 15 min)
+
+            // Calculate fee: ₹20 base + (rounded minutes / 15) × ₹5
             const roundedMinutes = Math.ceil(minutes / 15) * 15;
-            const amount = (roundedMinutes / 15) * 5;
-            console.log('Using CHECKED_IN data:', { minutes, hours, amount });
+            const timeCharge = (roundedMinutes / 15) * RATE_PER_15_MIN;
+            const amount = BASE_FEE + timeCharge;
+
+            console.log('Using CHECKED_IN data:', { minutes, hours, roundedMinutes, timeCharge, amount });
             return { hours, amount: amount.toFixed(2) };
         }
 
-        // For scheduled bookings or fallback, show booked duration
-        const start = new Date(booking.startTime);
-        const end = new Date(booking.endTime);
-        const hours = Math.abs(end - start) / 36e5; // milliseconds to hours
-        const amount = hours * 20; // ₹20 per hour
-        console.log('Using SCHEDULED/fallback data:', { hours, amount, parkingStatus: booking.parkingStatus });
-        return { hours: hours.toFixed(2), amount: amount.toFixed(2) };
+        // For scheduled bookings (not yet checked in), show minimum charge
+        console.log('Using SCHEDULED data - showing minimum charge');
+        return { hours: '0.00', amount: BASE_FEE.toFixed(2) };
     };
+
+    // Add interval to update checked-in bookings every second
+    useEffect(() => {
+        const hasCheckedInBookings = bookings.some(b => b.parkingStatus === 'CHECKED_IN');
+
+        if (hasCheckedInBookings) {
+            const interval = setInterval(() => {
+                // Force re-render to update times
+                setBookings(prev => [...prev]);
+            }, 1000);
+
+            return () => clearInterval(interval);
+        }
+    }, [bookings]);
 
     const handlePayNow = (booking) => {
         setSelectedBooking(booking);
