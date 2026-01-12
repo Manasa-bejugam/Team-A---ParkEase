@@ -143,7 +143,7 @@ const MyPayments = () => {
                 <div className="payments-list">
                     {bookings.map((booking) => {
                         const payment = calculatePayment(booking);
-                        const isPaid = booking.paymentStatus === 'PAID';
+                        const isPaid = booking.payment?.status === 'completed';
 
                         return (
                             <div key={booking._id} className="payment-card">
@@ -184,7 +184,7 @@ const MyPayments = () => {
                                     </div>
                                 </div>
 
-                                {!isPaid && (
+                                {!isPaid && booking.parkingStatus === 'CHECKED_OUT' && (
                                     <button
                                         className="pay-now-btn"
                                         onClick={() => handlePayNow(booking)}
@@ -193,9 +193,9 @@ const MyPayments = () => {
                                     </button>
                                 )}
 
-                                {isPaid && booking.paymentMethod && (
+                                {isPaid && booking.payment?.method && (
                                     <div className="payment-method-info">
-                                        Paid via {booking.paymentMethod.toUpperCase()}
+                                        Paid via {booking.payment.method.toUpperCase()}
                                     </div>
                                 )}
                             </div>
