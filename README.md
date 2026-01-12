@@ -162,6 +162,35 @@ cd myapp2/myapp && npm start
 cd parking-validator && mvn spring-boot:run
 ```
 
+### 4. Frontend (React)
+```bash
+cd myapp2/myapp
+npm install
+npm start
+```
+Runs on `http://localhost:3000`
+
+### 5. Generate Admin Invite Token (Required for Admin Registration)
+```bash
+cd backend
+node generateInvite.js
+```
+This will generate a 24-hour valid admin invite token and save it to `invite_token.txt`. Use this token when registering as an admin.
+
+**Note**: The token expires after 24 hours for security. Generate a new one if needed.
+
+## Admin Access
+
+To create an admin account:
+1. Generate an admin invite token: `node backend/generateInvite.js`
+2. Copy the token from `backend/invite_token.txt`
+3. Register with role "admin" and paste the token in the admin secret field
+4. Login with your admin credentials
+
+**Default Test Admin** (if seeded):
+- Email: `admin@parking.com`  
+- Password: `admin123`
+
 ## 🔐 Environment Variables
 
 ### Backend (.env)
