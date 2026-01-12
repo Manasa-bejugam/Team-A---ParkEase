@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { getMyBookings } from '../api';
+import { API_BASE_URL } from '../config';
 import './MyPayments.css';
 
 const MyPayments = () => {
@@ -14,11 +16,7 @@ const MyPayments = () => {
     const loadBookings = async () => {
         try {
             setLoading(true);
-            const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/bookings/my-bookings', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const data = await response.json();
+            const data = await getMyBookings();
 
             // Ensure data is an array
             if (Array.isArray(data)) {
@@ -103,7 +101,7 @@ const MyPayments = () => {
             const token = localStorage.getItem('token');
             const payment = calculatePayment(selectedBooking);
 
-            const response = await fetch('http://localhost:5000/api/payments/process', {
+            const response = await fetch(`${API_BASE_URL}/payments/process`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
