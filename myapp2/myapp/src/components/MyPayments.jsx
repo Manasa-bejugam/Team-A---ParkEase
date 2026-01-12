@@ -51,7 +51,7 @@ const MyPayments = () => {
         // If booking has been checked out, use actual duration and payment amount
         if ((booking.parkingStatus === 'CHECKED_OUT' || booking.status === 'COMPLETED') && booking.actualDuration) {
             const hours = (booking.actualDuration / 60).toFixed(2);
-            const amount = booking.payment?.amount || 0;
+            const amount = booking.payment?.amount || BASE_FEE; // Show minimum BASE_FEE if amount is 0
             console.log('Using CHECKED_OUT/COMPLETED data:', { hours, amount });
             return { hours, amount: amount.toFixed(2) };
         }
