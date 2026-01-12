@@ -146,6 +146,9 @@ const MyPayments = () => {
                         // Only show as paid if checked out AND payment completed
                         const isPaid = booking.parkingStatus === 'CHECKED_OUT' && booking.payment?.status === 'completed';
 
+                        // Debug logging
+                        console.log(`Booking ${booking._id}: parkingStatus=${booking.parkingStatus}, payment.status=${booking.payment?.status}, isPaid=${isPaid}`);
+
                         return (
                             <div key={booking._id} className="payment-card">
                                 <div className="payment-header">

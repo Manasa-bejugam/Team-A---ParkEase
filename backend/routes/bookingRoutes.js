@@ -245,6 +245,7 @@ router.post("/:id/check-out", authMiddleware, async (req, res) => {
         // Calculate fee
         const feeDetails = feeCalculationService.calculateFee(durationMinutes);
         booking.payment.amount = feeDetails.fee;
+        booking.payment.status = "pending"; // Explicitly set to pending, payment not yet processed
 
         // Update status
         booking.parkingStatus = "CHECKED_OUT";
