@@ -143,7 +143,8 @@ const MyPayments = () => {
                 <div className="payments-list">
                     {bookings.map((booking) => {
                         const payment = calculatePayment(booking);
-                        const isPaid = booking.payment?.status === 'completed';
+                        // Only show as paid if checked out AND payment completed
+                        const isPaid = booking.parkingStatus === 'CHECKED_OUT' && booking.payment?.status === 'completed';
 
                         return (
                             <div key={booking._id} className="payment-card">
