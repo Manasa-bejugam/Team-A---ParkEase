@@ -10,6 +10,17 @@ const SALT_ROUNDS = 10;
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "SmartParkingAdmin2024";
 const JWT_SECRET = process.env.JWT_SECRET || "smartparking_jwt_secret";
 
+// TEMPORARY DEBUG ENDPOINT - Remove after testing
+router.get("/debug-env", (req, res) => {
+  res.json({
+    jwtSecretLength: JWT_SECRET.length,
+    jwtSecretFirst10: JWT_SECRET.substring(0, 10),
+    jwtSecretLast10: JWT_SECRET.substring(JWT_SECRET.length - 10),
+    hasJwtSecret: !!process.env.JWT_SECRET,
+    nodeEnv: process.env.NODE_ENV
+  });
+});
+
 // REGISTER
 router.post("/register", validationSchemas.register, validate, async (req, res) => {
   try {
