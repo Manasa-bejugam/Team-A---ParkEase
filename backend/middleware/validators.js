@@ -32,14 +32,12 @@ const validators = {
             .isEmail().withMessage('Invalid email format')
             .normalizeEmail(),
 
-    // Password validation (strong password)
+    // Password validation (reasonable security)
     password: () =>
         body('password')
-            .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
-            .matches(/[A-Z]/).withMessage('Password must contain at least one uppercase letter')
-            .matches(/[a-z]/).withMessage('Password must contain at least one lowercase letter')
-            .matches(/[0-9]/).withMessage('Password must contain at least one number')
-            .matches(/[!@#$%^&*]/).withMessage('Password must contain at least one special character'),
+            .isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+            .matches(/[A-Za-z]/).withMessage('Password must contain at least one letter')
+            .matches(/[0-9]/).withMessage('Password must contain at least one number'),
 
     // Vehicle number validation (flexible format with sanitization)
     vehicleNumber: () =>

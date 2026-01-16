@@ -133,7 +133,7 @@ const Register = ({ onSwitchToLogin }) => {
                         <input
                             type="password"
                             name="password"
-                            placeholder="Create a password"
+                            placeholder="Min 6 chars, 1 letter, 1 number"
                             value={formData.password}
                             onChange={handleChange}
                             required
