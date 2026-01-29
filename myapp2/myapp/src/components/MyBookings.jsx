@@ -30,6 +30,7 @@ const MyBookings = () => {
             // Ensure bookings is an array and filter out invalid/dummy data if any
             const sanitizedBookings = (Array.isArray(data) ? data : []).map(booking => ({
                 ...booking,
+                _id: booking.id || booking._id,
                 parkingStatus: booking.parkingStatus || 'SCHEDULED' // Default to SCHEDULED if undefined
             }));
 
@@ -183,7 +184,7 @@ const MyBookings = () => {
             {/* Modals */}
             {showFeeDetails && selectedBooking && (
                 <FeeDetails
-                    booking={selectedBooking}
+                    bookingId={selectedBooking._id}
                     onClose={() => setShowFeeDetails(false)}
                 />
             )}

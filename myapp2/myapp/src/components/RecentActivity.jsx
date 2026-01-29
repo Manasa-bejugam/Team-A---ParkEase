@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { API_BASE_URL } from '../config';
 import './RecentActivity.css';
 
 const RecentActivity = () => {
@@ -8,7 +9,7 @@ const RecentActivity = () => {
     const fetchActivity = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/analytics/activity', {
+            const response = await fetch(`${API_BASE_URL}/analytics/activity`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

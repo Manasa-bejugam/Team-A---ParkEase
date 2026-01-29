@@ -78,15 +78,15 @@ const BookingForm = ({ slots, selectedSlot: propSelectedSlot, onBookingSuccess }
       const bookingData = {
         slotId: selectedSlotId,
         vehicleNumber: vehicleNumber.trim().toUpperCase(),
-        startTime: new Date(startTime).toISOString(),
-        endTime: new Date(endTime).toISOString()
+        startTime: new Date(startTime).toISOString().slice(0, 19),
+        endTime: new Date(endTime).toISOString().slice(0, 19)
       };
 
       const response = await createBooking(bookingData);
 
       // Store booking data and show payment summary
       setCreatedBooking({
-        _id: response.booking?._id || 'temp-id',
+        _id: response.booking?.id || response.booking?._id || 'temp-id',
         ...bookingData,
         slotNumber: slots.find(s => (s._id || s.id) === selectedSlotId)?.slotNumber || 'Unknown'
       });

@@ -314,7 +314,7 @@ export const getFeeDetails = async (bookingId) => {
 // Admin: Create alert
 export const createAlert = async (alertData) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/admin/alerts`, {
+        const response = await fetch(`${API_BASE_URL}/alerts`, {
             method: 'POST',
             headers: getAuthHeaders(),
             body: JSON.stringify(alertData)
@@ -336,7 +336,7 @@ export const createAlert = async (alertData) => {
 // Admin: Get all alerts (including inactive)
 export const getAllAlertsAdmin = async () => {
     try {
-        const response = await fetch(`${API_BASE_URL}/admin/alerts/all`, {
+        const response = await fetch(`${API_BASE_URL}/alerts/all`, {
             headers: getAuthHeaders()
         });
 
@@ -355,7 +355,7 @@ export const getAllAlertsAdmin = async () => {
 // Admin: Update alert
 export const updateAlert = async (alertId, alertData) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/admin/alerts/${alertId}`, {
+        const response = await fetch(`${API_BASE_URL}/alerts/${alertId}`, {
             method: 'PUT',
             headers: getAuthHeaders(),
             body: JSON.stringify(alertData)
@@ -377,7 +377,7 @@ export const updateAlert = async (alertId, alertData) => {
 // Admin: Delete alert
 export const deleteAlert = async (alertId) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/admin/alerts/${alertId}`, {
+        const response = await fetch(`${API_BASE_URL}/alerts/${alertId}`, {
             method: 'DELETE',
             headers: getAuthHeaders()
         });

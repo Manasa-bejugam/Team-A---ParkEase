@@ -429,7 +429,7 @@ const UserDashboard = () => {
   const [notification, setNotification] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(''); // Location filter by slot ID
   const { user, logout } = useAuth();
-  const { isConnected, onSlotUpdate, onBookingCreated } = useSocket();
+  const { isConnected, onSlotUpdate, onAlertCreated } = useSocket();
 
   // Fetch slots from backend
   useEffect(() => {
@@ -442,7 +442,12 @@ const UserDashboard = () => {
     onSlotUpdate((updatedSlot) => {
       setSlots((prevSlots) =>
         prevSlots.map((slot) =>
-          slot._id === updatedSlot._id ? updatedSlot : slot
+          (slot.id || slot._id) === (updatedSlot.id || updatedSlot._id) ? updatedSlot : slot
+        )
+      );
+      setAllSlots((prevAllSlots) =>
+        prevAllSlots.map((slot) =>
+          (slot.id || slot._id) === (updatedSlot.id || updatedSlot._id) ? updatedSlot : slot
         )
       );
 
@@ -450,13 +455,11 @@ const UserDashboard = () => {
       showNotification(`Slot ${updatedSlot.slotNumber} ${updatedSlot.isAvailable ? 'is now available' : 'was just booked'}!`);
     });
 
-    // Listen for booking notifications
-    onBookingCreated((booking) => {
-      showNotification(`${booking.userName} just booked slot ${booking.slotNumber}!`);
-      // Reload slots to get latest data
-      loadSlots();
+    // Listen for alert notifications
+    onAlertCreated((alert) => {
+      showNotification(`⚠️ ${alert.type}: ${alert.message}`);
     });
-  }, [onSlotUpdate, onBookingCreated]);
+  }, [onSlotUpdate, onAlertCreated]);
 
   const loadSlots = async () => {
     try {

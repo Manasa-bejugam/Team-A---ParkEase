@@ -186,13 +186,19 @@ const PaymentSummary = ({ booking, onPaymentComplete, onCancel }) => {
                     <h3>Payment Summary</h3>
                     <div className="summary-row">
                         <span className="summary-label">Parking Duration:</span>
-                        <span className="summary-value">{paymentData?.durationHours.toFixed(2)} hours</span>
+                        <span className="summary-value">
+                            {paymentData?.durationHours ? paymentData.durationHours.toFixed(2) : '0.00'} hours
+                        </span>
                     </div>
                     <div className="summary-row">
                         <span className="summary-label">Estimated Fee:</span>
-                        <span className="summary-value estimated-fee">₹{paymentData?.amount.toFixed(2)}</span>
+                        <span className="summary-value estimated-fee">
+                            ₹{paymentData?.amount !== undefined ? paymentData.amount.toFixed(2) : '0.00'}
+                        </span>
                     </div>
-                    <div className="breakdown-text">{paymentData?.breakdown}</div>
+                    {paymentData?.breakdown && (
+                        <div className="breakdown-text">{paymentData.breakdown}</div>
+                    )}
                 </div>
 
                 {/* Payment Method Selection */}
@@ -250,7 +256,7 @@ const PaymentSummary = ({ booking, onPaymentComplete, onCancel }) => {
                     <button
                         className="start-parking-btn"
                         onClick={handleStartParking}
-                        disabled={processing}
+                        disabled={processing || !paymentData}
                     >
                         {processing ? 'Processing...' : 'Start Parking'}
                     </button>

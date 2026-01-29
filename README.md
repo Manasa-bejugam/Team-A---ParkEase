@@ -61,18 +61,15 @@ Smart Parking is a modern parking management system designed to streamline the p
 - **React QR Code** - QR ticket generation
 
 ### Backend
-- **Node.js** - Runtime environment
-- **Express 5** - Web framework
-- **MongoDB** - NoSQL database
-- **Mongoose** - ODM for MongoDB
-- **Socket.IO** - WebSocket server
-- **JWT** - Authentication
-- **Bcrypt** - Password hashing
-- **Winston** - Logging
-- **Express Validator** - Input validation
-
-### Microservices
-- **Java Spring Boot** - Booking validation service
+- **Spring Boot 3.2** - Java backend framework
+- **Spring Data MongoDB** - MongoDB integration
+- **Spring WebSocket** - Real-time updates via STOMP
+- **Spring Security** - Authentication and authorization
+- **JWT** - Token-based authentication
+- **BCrypt** - Password hashing
+- **SLF4J/Logback** - Logging framework
+- **Spring Validation** - Input validation
+- **Spring Scheduling** - Automated tasks (slot release)
 - **Maven** - Dependency management
 
 ### Security & DevOps
@@ -95,16 +92,16 @@ Smart Parking is a modern parking management system designed to streamline the p
          │                  │
          └─── WebSocket ────┤
                            │
-                    ┌──────▼──────┐
-                    │  Express    │ ← Backend (Render)
-                    │  (Port 5000)│
-                    └──────┬──────┘
+                    ┌──────▼──────────┐
+                    │  Spring Boot    │ ← Backend
+                    │   (Port 8080)   │
+                    └──────┬──────────┘
                            │
          ┌─────────────────┼─────────────────┐
          │                 │                 │
     ┌────▼────┐      ┌────▼────┐      ┌────▼────┐
-    │ MongoDB │      │  Java   │      │ Socket  │
-    │         │      │Validator│      │   IO    │
+    │ MongoDB │      │ WebSocket│      │Scheduler│
+    │  Atlas  │      │   STOMP  │      │  Tasks  │
     └─────────┘      └─────────┘      └─────────┘
 ```
 
@@ -124,14 +121,14 @@ git clone https://github.com/Manasa-bejugam/smartParking.git
 cd smartParking
 ```
 
-2. **Backend Setup**
+2. **Backend Setup (Spring Boot)**
 ```bash
-cd backend
-npm install
-cp .env.example .env
-# Edit .env with your MongoDB URI and JWT secret
-npm start
+cd parking-validator
+# Edit src/main/resources/application.properties with your MongoDB URI
+mvn spring-boot:run
 ```
+
+Backend runs on `http://localhost:8080`
 
 3. **Frontend Setup**
 ```bash
@@ -140,11 +137,7 @@ npm install
 npm start
 ```
 
-4. **Java Validator Service** (Optional)
-```bash
-cd parking-validator
-mvn spring-boot:run
-```
+Frontend runs on `http://localhost:3000`
 
 ### Quick Start Script
 ```bash
@@ -152,62 +145,52 @@ mvn spring-boot:run
 run_all.bat
 
 # Or manually:
-# Terminal 1: Backend
-cd backend && npm start
-
-# Terminal 2: Frontend
-cd myapp2/myapp && npm start
-
-# Terminal 3: Validator
+# Terminal 1: Spring Boot Backend
 cd parking-validator && mvn spring-boot:run
+
+# Terminal 2: React Frontend
+cd myapp2/myapp && npm start
 ```
 
-### 4. Frontend (React)
-```bash
-cd myapp2/myapp
-npm install
-npm start
-```
-Runs on `http://localhost:3000`
+### Admin Access
 
-### 5. Generate Admin Invite Token (Required for Admin Registration)
-```bash
-cd backend
-node generateInvite.js
-```
-This will generate a 24-hour valid admin invite token and save it to `invite_token.txt`. Use this token when registering as an admin.
+To create an admin account, you'll need to generate an admin invite token using the Spring Boot API or through direct database insertion. For development:
 
-**Note**: The token expires after 24 hours for security. Generate a new one if needed.
-
-## Admin Access
-
-To create an admin account:
-1. Generate an admin invite token: `node backend/generateInvite.js`
-2. Copy the token from `backend/invite_token.txt`
-3. Register with role "admin" and paste the token in the admin secret field
-4. Login with your admin credentials
+1. Start the Spring Boot backend
+2. Use the `/api/admin/generate-invite` endpoint (if available)
+3. Or register with role "user" first, then manually update the role in MongoDB to "admin"
 
 **Default Test Admin** (if seeded):
 - Email: `admin@parking.com`  
 - Password: `admin123`
 
-## 🔐 Environment Variables
+**Note**: The backend automatically seeds sample data on first startup.
 
-### Backend (.env)
-```env
-MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/smartparking
-JWT_SECRET=your_super_secret_jwt_key_min_32_chars
-PORT=5000
-NODE_ENV=development
-JAVA_VALIDATOR_URL=http://localhost:8080/api/validate-slot
-JAVA_ANALYTICS_URL=http://localhost:8080/api/analytics
+## 🔐 Configuration
+
+### Backend (application.properties)
+```properties
+# Server Configuration
+server.port=8080
+
+# MongoDB Configuration
+spring.data.mongodb.uri=mongodb+srv://username:password@cluster.mongodb.net/smartparking
+
+# JWT Configuration
+jwt.secret=your_super_secret_jwt_key_min_64_chars_for_hs512_algorithm
+jwt.expiration=86400000
+
+# Logging
+logging.level.com.parking.validator=DEBUG
 ```
 
 ### Frontend (config.js)
 ```javascript
-export const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://your-backend.onrender.com/api'
-  : 'http://localhost:5000/api';
+export const BACKEND_URL = isDevelopment
+  ? 'http://localhost:8080'
+  : 'https://your-production-backend-url.com';
+  
+export const API_BASE_URL = `${BACKEND_URL}/api`;
 ```
 
 ## 📚 API Documentation
@@ -252,13 +235,15 @@ export const API_BASE_URL = process.env.NODE_ENV === 'production'
 5. Add environment variables
 6. Deploy
 
-### Backend (Render/Railway)
-1. Create new Web Service
+### Backend (Render/Railway/Heroku)
+1. Create new Web Service for Java application
 2. Connect GitHub repository
-3. Set build command: `npm install`
-4. Set start command: `npm start`
-5. Add environment variables
+3. Set build command: `mvn clean package`
+4. Set start command: `java -jar target/parking-validator-1.0.0.jar`
+5. Add environment variables in application.properties
 6. Deploy
+
+**Alternative**: Deploy as Docker container for easier configuration
 
 ## 📸 Screenshots
 
