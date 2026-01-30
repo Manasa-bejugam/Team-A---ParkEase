@@ -61,7 +61,7 @@ const AdminDashboard = ({ onSwitchToUserView }) => {
     const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
     // WebSockets
-    const { isConnected, onSlotUpdate, onAlertCreated, onAlertDeleted } = useSocket();
+    const { onSlotUpdate, onAlertCreated, onAlertDeleted } = useSocket();
 
     // Load data based on active tab
     useEffect(() => {

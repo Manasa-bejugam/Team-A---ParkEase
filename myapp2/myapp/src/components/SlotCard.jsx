@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { getSlotAlerts, getAreaAlerts } from '../api';
+import React, { useState } from 'react';
 import AlertBadge from './AlertBadge';
 import AlertModal from './AlertModal';
 import './SlotCard.css';
 
 const SlotCard = ({ slot, alerts, onSelect }) => {
   const [showAlertModal, setShowAlertModal] = useState(false);
-  const loadingAlerts = false; // Prop-based alerts are always "loaded" from perspective of this component
 
   const isAvailable = slot.isAvailable;
   const statusClass = isAvailable ? 'available' : 'booked';

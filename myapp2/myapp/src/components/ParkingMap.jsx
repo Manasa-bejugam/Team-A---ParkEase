@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { getSlotAlerts, getAreaAlerts } from '../api';
+import { fetchParkingSlots, getAvailableSlotsCount } from '../api';
 import AlertModal from './AlertModal';
 import './ParkingMap.css';
 
