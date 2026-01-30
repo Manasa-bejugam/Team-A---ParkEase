@@ -37,7 +37,7 @@ public class BookingService {
                 .build();
 
         // Update slot availability and emit WebSocket event
-        slotService.updateSlotAvailability(slot.getId(), false);
+        slotService.updateSlotAvailability(java.util.Objects.requireNonNull(slot.getId()), false);
 
         @SuppressWarnings("null")
         Booking saved = bookingRepository.save(booking);

@@ -43,7 +43,8 @@ public class AlertController {
                 .build();
 
         if (request.getSlotId() != null) {
-            Optional<Slot> slotOptional = slotService.getSlotById(request.getSlotId());
+            Optional<Slot> slotOptional = slotService
+                    .getSlotById(java.util.Objects.requireNonNull(request.getSlotId()));
             if (slotOptional.isEmpty()) {
                 return ResponseEntity.status(404).body(Map.of("message", "Slot not found"));
             }

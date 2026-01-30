@@ -150,7 +150,7 @@ public class AuthController {
                                 .role(activeRole)
                                 .build();
 
-                userRepository.save(user);
+                userRepository.save(java.util.Objects.requireNonNull(user));
 
                 // Auto-login
                 Authentication authentication = authenticationManager.authenticate(
