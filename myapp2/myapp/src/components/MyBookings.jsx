@@ -5,6 +5,7 @@ import PaymentModal from './PaymentModal';
 import ParkingActions from './ParkingActions';
 import LiveParkingTimer from './LiveParkingTimer';
 import TicketModal from './TicketModal';
+import { calculateFee } from '../utils/feeUtils';
 import './MyBookings.css';
 
 const MyBookings = () => {
@@ -20,6 +21,20 @@ const MyBookings = () => {
     useEffect(() => {
         loadBookings();
     }, []);
+
+    // Add interval to update checked-in bookings every second so fee updates in real-time
+    useEffect(() => {
+        const hasCheckedInBookings = bookings.some(b => b.parkingStatus === 'CHECKED_IN');
+
+        if (hasCheckedInBookings) {
+            const interval = setInterval(() => {
+                // Force re-render to update fees
+                setBookings(prev => [...prev]);
+            }, 1000);
+
+            return () => clearInterval(interval);
+        }
+    }, [bookings]);
 
     const loadBookings = async () => {
         try {
@@ -135,7 +150,7 @@ const MyBookings = () => {
                                 {booking.payment && (
                                     <div className="detail-row fee-row">
                                         <span className="label">Total Fee</span>
-                                        <span className="value fee-amount">₹{booking.payment.amount?.toFixed(2)}</span>
+                                        <span className="value fee-amount">₹{calculateFee(booking).amount}</span>
                                     </div>
                                 )}
                             </div>

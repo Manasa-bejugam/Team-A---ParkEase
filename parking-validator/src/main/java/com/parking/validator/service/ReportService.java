@@ -52,8 +52,11 @@ public class ReportService {
                 summary.put("completedBookings",
                                 bookings.stream().filter(b -> b.getStatus() == Booking.BookingStatus.COMPLETED)
                                                 .count());
-                summary.put("totalRevenue", bookings.stream().filter(b -> b.getPayment() != null)
-                                .mapToDouble(b -> b.getPayment().getAmount()).sum());
+                summary.put("totalRevenue", bookings.stream()
+                                .filter(b -> b.getPayment() != null
+                                                && b.getPayment().getStatus() == Booking.PaymentStatus.completed)
+                                .mapToDouble(b -> b.getPayment().getAmount() != null ? b.getPayment().getAmount() : 0.0)
+                                .sum());
 
                 double avgDuration = bookings.stream()
                                 .filter(b -> b.getActualDuration() != null && b.getActualDuration() > 0)
@@ -89,8 +92,11 @@ public class ReportService {
                         double revenue = bookings.stream()
                                         .filter(b -> b.getCreatedAt() != null && !b.getCreatedAt().isBefore(dayStart)
                                                         && !b.getCreatedAt().isAfter(dayEnd))
-                                        .filter(b -> b.getPayment() != null)
-                                        .mapToDouble(b -> b.getPayment().getAmount())
+                                        .filter(b -> b.getPayment() != null && b.getPayment()
+                                                        .getStatus() == Booking.PaymentStatus.completed)
+                                        .mapToDouble(b -> b.getPayment().getAmount() != null
+                                                        ? b.getPayment().getAmount()
+                                                        : 0.0)
                                         .sum();
 
                         Map<String, Object> dataPoint = new HashMap<>();
@@ -153,8 +159,12 @@ public class ReportService {
                                         double rev = bookings.stream()
                                                         .filter(b -> b.getSlot() != null && e.getKey()
                                                                         .equals(b.getSlot().getSlotNumber()))
-                                                        .filter(b -> b.getPayment() != null)
-                                                        .mapToDouble(b -> b.getPayment().getAmount()).sum();
+                                                        .filter(b -> b.getPayment() != null && b.getPayment()
+                                                                        .getStatus() == Booking.PaymentStatus.completed)
+                                                        .mapToDouble(b -> b.getPayment().getAmount() != null
+                                                                        ? b.getPayment().getAmount()
+                                                                        : 0.0)
+                                                        .sum();
                                         m.put("revenue", rev);
                                         return m;
                                 })
@@ -190,8 +200,11 @@ public class ReportService {
 
                 long completedCount = bookings.stream().filter(b -> b.getStatus() == Booking.BookingStatus.COMPLETED)
                                 .count();
-                double totalSpent = bookings.stream().filter(b -> b.getPayment() != null)
-                                .mapToDouble(b -> b.getPayment().getAmount()).sum();
+                double totalSpent = bookings.stream()
+                                .filter(b -> b.getPayment() != null
+                                                && b.getPayment().getStatus() == Booking.PaymentStatus.completed)
+                                .mapToDouble(b -> b.getPayment().getAmount() != null ? b.getPayment().getAmount() : 0.0)
+                                .sum();
                 long activeCount = bookings.stream()
                                 .filter(b -> b.getParkingStatus() == Booking.ParkingStatus.CHECKED_IN)
                                 .count();
@@ -247,8 +260,11 @@ public class ReportService {
                                         .filter(b -> b.getCreatedAt() != null &&
                                                         b.getCreatedAt().getYear() == day.getYear() &&
                                                         b.getCreatedAt().getDayOfYear() == day.getDayOfYear())
-                                        .filter(b -> b.getPayment() != null)
-                                        .mapToDouble(b -> b.getPayment().getAmount())
+                                        .filter(b -> b.getPayment() != null && b.getPayment()
+                                                        .getStatus() == Booking.PaymentStatus.completed)
+                                        .mapToDouble(b -> b.getPayment().getAmount() != null
+                                                        ? b.getPayment().getAmount()
+                                                        : 0.0)
                                         .sum();
 
                         Map<String, Object> dataPoint = new HashMap<>();

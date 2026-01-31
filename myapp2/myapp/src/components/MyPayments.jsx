@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getMyBookings } from '../api';
 import { API_BASE_URL } from '../config';
+import { calculateFee } from '../utils/feeUtils';
 import './MyPayments.css';
 
 const MyPayments = () => {
@@ -35,47 +36,7 @@ const MyPayments = () => {
         }
     };
 
-    const calculatePayment = (booking) => {
-        console.log('Calculating payment for booking:', {
-            id: booking._id,
-            parkingStatus: booking.parkingStatus,
-            actualDuration: booking.actualDuration,
-            actualEntryTime: booking.actualEntryTime,
-            actualExitTime: booking.actualExitTime,
-            paymentAmount: booking.payment?.amount
-        });
 
-        const BASE_FEE = 20.0;  // ₹20 base fee
-        const RATE_PER_15_MIN = 5.0;  // ₹5 per 15 minutes
-
-        // If booking has been checked out, use actual duration and payment amount
-        if ((booking.parkingStatus === 'CHECKED_OUT' || booking.status === 'COMPLETED') && booking.actualDuration) {
-            const hours = (booking.actualDuration / 60).toFixed(2);
-            const amount = booking.payment?.amount || BASE_FEE; // Show minimum BASE_FEE if amount is 0
-            console.log('Using CHECKED_OUT/COMPLETED data:', { hours, amount });
-            return { hours, amount: amount.toFixed(2) };
-        }
-
-        // If checked in but not checked out, calculate current usage based on actual time
-        if (booking.parkingStatus === 'CHECKED_IN' && booking.actualEntryTime) {
-            const now = new Date();
-            const entryTime = new Date(booking.actualEntryTime);
-            const minutes = Math.abs(now - entryTime) / 60000; // milliseconds to minutes
-            const hours = (minutes / 60).toFixed(2);
-
-            // Calculate fee: ₹20 base + (rounded minutes / 15) × ₹5
-            const roundedMinutes = Math.ceil(minutes / 15) * 15;
-            const timeCharge = (roundedMinutes / 15) * RATE_PER_15_MIN;
-            const amount = BASE_FEE + timeCharge;
-
-            console.log('Using CHECKED_IN data:', { minutes, hours, roundedMinutes, timeCharge, amount });
-            return { hours, amount: amount.toFixed(2) };
-        }
-
-        // For scheduled bookings (not yet checked in), show minimum charge
-        console.log('Using SCHEDULED data - showing minimum charge');
-        return { hours: '0.00', amount: BASE_FEE.toFixed(2) };
-    };
 
     // Add interval to update checked-in bookings every second
     useEffect(() => {
@@ -99,7 +60,7 @@ const MyPayments = () => {
     const processPayment = async (method) => {
         try {
             const token = localStorage.getItem('token');
-            const payment = calculatePayment(selectedBooking);
+            const payment = calculateFee(selectedBooking);
 
             const response = await fetch(`${API_BASE_URL}/payments/process`, {
                 method: 'POST',
@@ -142,7 +103,7 @@ const MyPayments = () => {
             ) : (
                 <div className="payments-list">
                     {bookings.map((booking) => {
-                        const payment = calculatePayment(booking);
+                        const payment = calculateFee(booking);
                         // Only show as paid if checked out AND payment completed
                         const isPaid = booking.parkingStatus === 'CHECKED_OUT' && booking.payment?.status === 'completed';
 
@@ -212,7 +173,7 @@ const MyPayments = () => {
                         <h3>Select Payment Method</h3>
                         <div className="payment-amount-display">
                             <span>Amount to Pay:</span>
-                            <span className="modal-amount">₹{calculatePayment(selectedBooking).amount}</span>
+                            <span className="modal-amount">₹{calculateFee(selectedBooking).amount}</span>
                         </div>
 
                         <div className="payment-methods-grid">
