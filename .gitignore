@@ -1,37 +1,38 @@
-# General
-milestone1.md
-run_all.bat
+# Dependencies
 node_modules/
-.env*
-.env.local
-dist/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+
+# Production
 build/
-*.log
+dist/
+
+# Misc
+.DS_Store
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDEs
 .vscode/
 .idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+*.swp
+*.swo
 
-# Java/Maven/Gradle
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Java/Spring Boot
 target/
-bin/
 *.class
 *.jar
 *.war
 *.ear
-.project
-.classpath
-.factorypath
-.settings/
-.gradle/
-build/
-
-# Security - Admin invite tokens
-backend/invite_token.txt
-
-# Database seeding (contains production credentials)
-backend/seedProductionDB.js
-
+.mvn/wrapper/maven-wrapper.jar
