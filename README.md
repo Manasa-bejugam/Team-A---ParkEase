@@ -258,8 +258,13 @@ Contributions are welcome! Please follow these steps:
 ## 👥 Team
 
 **Team A - ParkEase**
-- Lead Developer: [Manasa Bejugam](https://github.com/Manasa-bejugam)
-- Developed collaboratively by Team A.
+- **Manasa Bejugam** - Lead Developer ([@Manasa-bejugam](https://github.com/Manasa-bejugam))
+- **Vishnu Chaithanya** - [GitHub](https://github.com/vishnuchaithanya1)
+- **Sathvika** - [GitHub](https://github.com/Sathvika2955)
+- **Sandeep** - [GitHub](https://github.com/YedelliSandeep010)
+- **Boomika** - [GitHub](https://github.com/BoomikaSanthos)
+
+Developed collaboratively by Team A.
 
 ## 📝 License
 
