@@ -11,7 +11,7 @@ A comprehensive team-developed full-stack parking management solution with real-
 - [Getting Started](#getting-started)
 - [Environment Variables](#environment-variables)
 - [API Documentation](#api-documentation)
-- [Screenshots](#screenshots)
+- [API Documentation](#api-documentation)
 - [Contributing](#contributing)
 - [Team](#team)
 
@@ -218,20 +218,6 @@ export const API_BASE_URL = `${BACKEND_URL}/api`;
 ### Reports (Admin)
 - `GET /api/reports/usage` - Usage report
 - `GET /api/reports/revenue` - Revenue report
-
-## 📸 Screenshots
-
-### User Dashboard
-![User Dashboard](docs/screenshots/user-dashboard.png)
-
-### Interactive Map
-![Map View](docs/screenshots/map-view.png)
-
-### Admin Analytics
-![Admin Dashboard](docs/screenshots/admin-dashboard.png)
-
-### QR Ticket
-![QR Ticket](docs/screenshots/qr-ticket.png)
 
 ## 🧪 Testing
 
