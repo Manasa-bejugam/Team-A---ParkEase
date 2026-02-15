@@ -11,7 +11,6 @@ A comprehensive team-developed full-stack parking management solution with real-
 - [Getting Started](#getting-started)
 - [Environment Variables](#environment-variables)
 - [API Documentation](#api-documentation)
-- [API Documentation](#api-documentation)
 - [Contributing](#contributing)
 - [Team](#team)
 
