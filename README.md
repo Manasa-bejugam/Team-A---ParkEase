@@ -1,6 +1,6 @@
-# 🚗 Smart Parking System
+# 🚗 Team A - ParkEase (Smart Parking System)
 
-A comprehensive full-stack parking management solution with real-time slot availability, automated payment processing, and interactive mapping features.
+A comprehensive team-developed full-stack parking management solution with real-time slot availability, automated payment processing, and interactive mapping features.
 
 ## 📋 Table of Contents
 
@@ -11,15 +11,13 @@ A comprehensive full-stack parking management solution with real-time slot avail
 - [Getting Started](#getting-started)
 - [Environment Variables](#environment-variables)
 - [API Documentation](#api-documentation)
-- [Deployment](#deployment)
 - [Screenshots](#screenshots)
 - [Contributing](#contributing)
+- [Team](#team)
 
 ## 🎯 Overview
 
-Smart Parking is a modern parking management system designed to streamline the parking experience for both users and administrators. The application provides real-time slot availability, automated check-in/check-out, dynamic pricing, and comprehensive analytics.
-
-**Live Application**: [https://smart-parking-brown.vercel.app](https://smart-parking-brown.vercel.app)
+Team A - ParkEase is a modern parking management system designed to streamline the parking experience for both users and administrators. This project was developed as a collaborative effort to solve urban parking challenges through real-time slot availability, automated check-in/check-out, dynamic pricing, and comprehensive analytics.
 
 ## ✨ Features
 
@@ -77,32 +75,30 @@ Smart Parking is a modern parking management system designed to streamline the p
 - **Express Rate Limit** - API rate limiting
 - **Morgan** - HTTP request logging
 - **CORS** - Cross-origin resource sharing
-- **Vercel** - Frontend deployment
-- **Render/Railway** - Backend deployment
 
 ## 🏗️ Architecture
 
 ```
 ┌─────────────────┐
-│   React App     │ ← Frontend (Vercel)
+│   React App     │ ← Frontend
 │   (Port 3000)   │
 └────────┬────────┘
          │
          ├─── HTTP/REST ────┐
          │                  │
          └─── WebSocket ────┤
-                           │
-                    ┌──────▼──────────┐
-                    │  Spring Boot    │ ← Backend
-                    │   (Port 8080)   │
-                    └──────┬──────────┘
-                           │
-         ┌─────────────────┼─────────────────┐
-         │                 │                 │
-    ┌────▼────┐      ┌────▼────┐      ┌────▼────┐
-    │ MongoDB │      │ WebSocket│      │Scheduler│
-    │  Atlas  │      │   STOMP  │      │  Tasks  │
-    └─────────┘      └─────────┘      └─────────┘
+                            │
+                     ┌──────▼──────────┐
+                     │  Spring Boot    │ ← Backend
+                     │   (Port 8080)   │
+                     └──────┬──────────┘
+                            │
+          ┌─────────────────┼─────────────────┐
+          │                 │                 │
+     ┌────▼────┐      ┌────▼────┐      ┌────▼────┐
+     │ MongoDB │      │ WebSocket│      │Scheduler│
+     │  Atlas  │      │   STOMP  │      │  Tasks  │
+     └─────────┘      └─────────┘      └─────────┘
 ```
 
 ## 🚀 Getting Started
@@ -117,8 +113,8 @@ Smart Parking is a modern parking management system designed to streamline the p
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/Manasa-bejugam/smartParking.git
-cd smartParking
+git clone https://github.com/Manasa-bejugam/Team-A---ParkEase.git
+cd Team-A---ParkEase
 ```
 
 2. **Backend Setup (Spring Boot)**
@@ -153,8 +149,6 @@ cd myapp2/myapp && npm start
 ```
 
 ### Admin Access
-
-To create an admin account, you'll need to generate an admin invite token using the Spring Boot API or through direct database insertion. For development:
 
 1. Start the Spring Boot backend
 2. Use the `/api/admin/generate-invite` endpoint (if available)
@@ -225,26 +219,6 @@ export const API_BASE_URL = `${BACKEND_URL}/api`;
 - `GET /api/reports/usage` - Usage report
 - `GET /api/reports/revenue` - Revenue report
 
-## 🌐 Deployment
-
-### Frontend (Vercel)
-1. Push code to GitHub
-2. Import project in Vercel
-3. Set build command: `npm run build`
-4. Set output directory: `build`
-5. Add environment variables
-6. Deploy
-
-### Backend (Render/Railway/Heroku)
-1. Create new Web Service for Java application
-2. Connect GitHub repository
-3. Set build command: `mvn clean package`
-4. Set start command: `java -jar target/parking-validator-1.0.0.jar`
-5. Add environment variables in application.properties
-6. Deploy
-
-**Alternative**: Deploy as Docker container for easier configuration
-
 ## 📸 Screenshots
 
 ### User Dashboard
@@ -271,9 +245,6 @@ export const API_BASE_URL = `${BACKEND_URL}/api`;
 7. Verify payment status
 8. Check admin dashboard for revenue
 
-### API Testing
-Use the provided Thunder Client/Postman collection in `/docs/api-collection.json`
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please follow these steps:
@@ -284,26 +255,16 @@ Contributions are welcome! Please follow these steps:
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
+## 👥 Team
+
+**Team A - ParkEase**
+- Lead Developer: [Manasa Bejugam](https://github.com/Manasa-bejugam)
+- Developed collaboratively by Team A.
+
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👨‍💻 Author
-
-**Manasa Bejugam**
-- GitHub: [@Manasa-bejugam](https://github.com/Manasa-bejugam)
-- Project Link: [https://github.com/Manasa-bejugam/smartParking](https://github.com/Manasa-bejugam/smartParking)
-
-## 🙏 Acknowledgments
-
-- Leaflet for mapping functionality
-- Socket.IO for real-time features
-- MongoDB Atlas for database hosting
-- Vercel for frontend hosting
-- React community for excellent documentation
-
 ---
 
 **⭐ If you found this project helpful, please give it a star!**
-< ! - -   L a s t   d e p l o y m e n t   t r i g g e r :   0 1 / 3 0 / 2 0 2 6   2 3 : 2 9 : 0 6   - - >  
- 
